@@ -1,4 +1,4 @@
-import React, { useState, useEffect,useReducer,useContext} from 'react';
+import React, { useState, useEffect,useReducer,useContext,useRef} from 'react';
 import AuthContext from '../../context/Auth-Context';
 import Card from '../UI/Card/Card';
 import classes from './Login.module.css';
@@ -39,6 +39,11 @@ const Login = (props) => {
   const [collegeIsValid, setcollegeIsValid] = useState();
   const [formIsValid, setFormIsValid] = useState(false);
 
+  const emailRef=useRef()
+  const passwordRef=useRef()
+  const collegeRef=useRef()
+
+ 
 // useEffect(()=>{
 //   const handler=setTimeout(()=>{
 //   // console.log("time out set")
@@ -91,16 +96,26 @@ const ctx=useContext(AuthContext)
     //console.log('is valid college')
     setcollegeIsValid(enteredcollegename.trim().length > 4);
   };
+
+  const{isValid:emailIsvalid}=emailState
+  const{isValid:passwordIsValid}=passwordState
   const submitHandler = (event) => {
     event.preventDefault();
-   
-   ctx.loginHandler(emailState.value, passwordState.value);
+   if(emailIsvalid&& passwordIsValid){
+    ctx.loginHandler(emailState.value, passwordState.value);
+   }
+   else if(!emailIsvalid){
+    emailRef.current.focus()
+   }else{
+    passwordRef.current.focus()
+   }
   };
 
   return (
     <Card className={classes.login}>
       <form onSubmit={submitHandler}>
         <UserInput
+        ref={emailRef}
         isValid={emailState.isValid}
         type="email"
         id="email"
@@ -110,6 +125,7 @@ const ctx=useContext(AuthContext)
         label='E-Mail'
         />
          <UserInput
+         ref={collegeRef}
         isValid={collegeIsValid}
         type="college"
         id="college"
@@ -119,6 +135,7 @@ const ctx=useContext(AuthContext)
         label="college name"
         />
         <UserInput
+        ref={passwordRef}
         isValid={passwordState.isValid}
         type="password"
         id="password"
@@ -128,7 +145,7 @@ const ctx=useContext(AuthContext)
         label="password"
         />
      <div className={classes.actions}>
-          <Button type="submit"  disabled={!formIsValid}>
+          <Button type="submit" >
             Login
           </Button>
         </div>
